@@ -61,27 +61,23 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
 
         $fillables = collect($fillables)->flatten()->toArray();
 
-//        $validations = [];
-
-        $validations = <<<TEXT
-TEXT;
+/*        $validations = <<<TEXT
+TEXT;*/
+        $validations = '';
 
         while($fillables) {
             $field = $this->anticipate('Enter Fillable', $fillables);
 
             $rules = $this->ask("Enter validation rules for $field field");
-            //            $validations[$field] = explode(' ', $rules);
-            $rules = explode(' ', $rules);
+            $rules = str_replace(' ', '|', $rules);
 
-            $validations .= <<<TEXT
-[$rules[0]]
-TEXT;
+            $validations .= "            \"$field\" => \"$rules\",\n";
 
             $fieldKey = array_keys($fillables, $field)[0];
             unset($fillables[$fieldKey]);
         }
 
-        dd($validations);
+        $validations = substr($validations, 0, -2);
 
         return array_merge($replace, [
             '{{ validations }}' => $validations
