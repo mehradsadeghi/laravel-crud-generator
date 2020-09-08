@@ -1,0 +1,101 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use Illuminate\Http\Request;
+
+class {{ class }} extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        ${{ modelPluralVariable }} = {{ model }}::all();
+
+        return view('{{ resourcePluralVariable }}.index', compact('{{ modelPluralVariable }}'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('{{ resourcePluralVariable }}.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $validated = $this->validate($request, [
+{{ validations }}
+        ]);
+
+        {{ model }}::create($validated);
+
+        return back()->with('message', 'item stored successfully');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \{{ namespacedModel }} ${{ modelVariable }}
+     * @return \Illuminate\Http\Response
+     */
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        return view('{{ resourcePluralVariable }}.show', compact('{{ modelVariable }}'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \{{ namespacedModel }} ${{ modelVariable }}
+     * @return \Illuminate\Http\Response
+     */
+    public function edit({{ model }} ${{ modelVariable }})
+    {
+        return view('{{ resourcePluralVariable }}.edit', compact('{{ modelVariable }}'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \{{ namespacedModel }} ${{ modelVariable }}
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, {{ model }} ${{ modelVariable }})
+    {
+        $validated = $this->validate($request, [
+{{ validations }}
+        ]);
+
+        ${{ modelVariable }}->update($validated);
+
+        return back()->with('message', 'item updated successfully');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \{{ namespacedModel }} ${{ modelVariable }}
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+
+        return back()->with('message', 'item deleted successfully');
+    }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "mehradsadeghi/laravel-crud-generator",
+  "description": "Generate CRUD for your laravel application like a breeze",
+  "keywords": [
+    "crud",
+    "crud-generator",
+    "laravel-crud-generator"
+  ],
+  "homepage": "https://github.com/mehradsadeghi/laravel-crud-generator",
+  "license": "MIT",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Mehrad Sadeghi",
+      "email": "mehrad177@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.1",
+    "laravel/framework": "5.*|6.*|7.*"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mehradsadeghi\\CrudGenerator\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mehradsadeghi\\CrudGenerator\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Mehradsadeghi\\CrudGenerator\\CrudGeneratorServiceProvider"
+      ]
+    }
+  }
+}
