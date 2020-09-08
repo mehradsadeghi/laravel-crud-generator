@@ -2,7 +2,6 @@
 
 namespace Mehradsadeghi\CrudGenerator;
 
-use App\Console\Commands\CrudGeneratorMakeCommand;
 use Illuminate\Support\ServiceProvider;
 
 class CrudGeneratorServiceProvider extends ServiceProvider {
