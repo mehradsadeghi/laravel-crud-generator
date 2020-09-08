@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Mehradsadeghi\CrudGenerator;
 
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Support\Facades\File;
