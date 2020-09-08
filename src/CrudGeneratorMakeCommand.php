@@ -62,14 +62,14 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
     protected function buildValidationReplacements(array $replace)
     {
         $model = new $replace['{{ namespacedModel }}']();
-
-        if(!$fillables = $model->getFillable()) {
-            return $replace;
-        }
+        $fillables = $model->getFillable();
 
         $fillables = array_chunk($fillables, 1);
 
         $this->table([['fillables']], $fillables);
+
+        $this->line('<fg=cyan;options=bold>>>></> Validation rules should be separated by <options=bold>white space</>.');
+        $this->line('Example: required min:6 max:100</>');
 
         $fillables = collect($fillables)->flatten()->toArray();
 
@@ -77,9 +77,10 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
 
         while($fillables) {
 
-            $field = $this->anticipate('Enter Fillable', $fillables);
+            $field = $this->anticipate('Select Fillable By Arrow Keys or Typing It', $fillables);
 
-            $rules = $this->ask("Enter validation rules for $field field");
+            $rules = $this->ask("Enter validation rules for <fg=cyan;options=bold>$field</> field");
+
             $rules = str_replace(' ', '|', $rules);
 
             $validations .= <<<TEXT
@@ -102,13 +103,13 @@ TEXT;
         if ($model = $this->option('model')) {
 
             if ($this->option('validation') and $this->modelHasFillables($model)) {
-                return base_path('stubs/controller.model.validation.stub');
+                return __DIR__.'/stubs/controller.model.validation.stub';
             }
 
-            return base_path('stubs/controller.model.stub');
+            return __DIR__.'/stubs/controller.model.stub';
         }
 
-        return base_path('stubs/controller.plain.stub');
+        return __DIR__.'/stubs/controller.plain.stub';
     }
 
     protected function getArguments()
@@ -128,17 +129,10 @@ TEXT;
 
     private function modelHasFillables($model)
     {
-        if(File::exists(app_path($model)) and app($this->parseModel($model))->getFillable()) {
+        if(File::exists(app_path("$model.php")) and app($this->parseModel($model))->getFillable()) {
             return true;
         }
 
         return false;
     }
 }
-
-/*
- * $this->call('migrate');
-        $table = Str::plural(lcfirst(class_basename($this->option('model'))));
-        dd(Schema::hasTable($table));
-        dd(Schema::getColumnListing($table));
- */
