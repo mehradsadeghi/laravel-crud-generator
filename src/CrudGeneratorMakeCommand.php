@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class CrudGeneratorMakeCommand extends ControllerMakeCommand
 {
-    protected $name = 'make:crud {--validation}';
+    protected $name = 'make:crud';
     protected $description = 'Create a controller with pre-defiend CRUD and validation rules';
     protected $type = 'Controller';
 
@@ -21,12 +21,11 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
         $replace = [];
 
         if ($model = $this->option('model')) {
-
             $replace = $this->buildModelReplacements($replace);
+        }
 
-            if ($this->option('validation') and $this->modelHasFillables($model)) {
-                $replace = $this->buildValidationReplacements($replace);
-            }
+        if ($model and $this->option('validation') and $this->modelHasFillables($model)) {
+            $replace = $this->buildValidationReplacements($replace, $replace['{{ namespacedModel }}']);
         }
 
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
@@ -39,30 +38,23 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
 
     protected function buildModelReplacements(array $replace)
     {
-        $modelClass = $this->parseModel($this->option('model'));
-
-        if (! class_exists($modelClass)) {
-            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $modelClass]);
-            }
-        }
+        $replacements = parent::buildModelReplacements($replace);
 
         return [
             '{{ modelPluralVariable }}' => Str::plural(lcfirst(class_basename($this->option('model')))),
             '{{ resourcePluralVariable }}' => Str::plural(lcfirst(class_basename($this->option('model')))),
             '{{ namespace }}' => $this->getDefaultNamespace($this->getNamespace($this->rootNamespace())),
-            '{{ namespacedModel }}' => $modelClass,
+            '{{ namespacedModel }}' => $replacements['DummyFullModelClass'],
             '{{ rootNamespace }}' => $this->rootNamespace(),
             '{{ class }}' => $this->getNameInput(),
-            '{{ model }}' => class_basename($modelClass),
-            '{{ modelVariable }}' => class_basename($modelClass),
+            '{{ model }}' => $replacements['DummyModelClass'],
+            '{{ modelVariable }}' => $replacements['DummyModelVariable'],
         ];
     }
 
-    protected function buildValidationReplacements(array $replace)
+    protected function buildValidationReplacements(array $replace, $model)
     {
-        $model = new $replace['{{ namespacedModel }}']();
-        $fillables = $model->getFillable();
+        $fillables = app($model)->getFillable();
 
         $fillables = array_chunk($fillables, 1);
 
@@ -83,12 +75,15 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
 
             $rules = str_replace(' ', '|', $rules);
 
-            $validations .= <<<TEXT
+            if($rules == '') {
+                $this->line("<bg=red;options=bold>`$field` will be ignored from validations</>");
+            } else {
+                $validations .= <<<TEXT
             "$field" => "$rules",\n
 TEXT;
+            }
 
-            $fieldKey = array_keys($fillables, $field)[0];
-            unset($fillables[$fieldKey]);
+            $fillables = $this->unsetByValue($field, $fillables);
         }
 
         $validations = substr($validations, 0, -2);
@@ -100,16 +95,15 @@ TEXT;
 
     protected function getStub()
     {
-        if ($model = $this->option('model')) {
+        $model = $this->option('model');
 
-            if ($this->option('validation') and $this->modelHasFillables($model)) {
-                return __DIR__.'/stubs/controller.model.validation.stub';
-            }
-
-            return __DIR__.'/stubs/controller.model.stub';
+        if ($model and $this->option('validation') and $this->modelHasFillables($model)) {
+            return base_path('stubs/controller.model.validation.stub');
+        } elseif ($model) {
+            return base_path('stubs/controller.model.stub');
+        } else {
+            return base_path('stubs/controller.plain.stub');
         }
-
-        return __DIR__.'/stubs/controller.plain.stub';
     }
 
     protected function getArguments()
@@ -134,5 +128,12 @@ TEXT;
         }
 
         return false;
+    }
+
+    private function unsetByValue($field, array $fillables)
+    {
+        $fieldKey = array_search($field, $fillables);
+        unset($fillables[$fieldKey]);
+        return $fillables;
     }
 }
