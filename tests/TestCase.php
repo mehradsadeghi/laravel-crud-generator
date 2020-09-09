@@ -2,13 +2,12 @@
 
 namespace Mehradsadeghi\CrudGenerator\Tests;
 
-
-use Mehradsadeghi\CrudGenerator\CrudGeneratorServiceProvider;
+use Mehradsadeghi\CrudGenerator\Tests\Stubs\TestCrudGeneratorServiceProvider;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected function getPackageProviders($app)
     {
-        return [CrudGeneratorServiceProvider::class];
+        return [TestCrudGeneratorServiceProvider::class];
     }
 }
