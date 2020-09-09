@@ -12,8 +12,7 @@ class CreateEmptyControllerTest extends TestCase
     {
         $this->assertFalse(File::exists($this->controller));
 
-        $this->artisan('make:crud', ['name' => 'UserController'])
-            ->assertExitCode(0);
+        $this->runCommandWith(['name' => 'UserController']);
 
         $this->assertTrue(File::exists($this->controller));
     }
@@ -23,14 +22,13 @@ class CreateEmptyControllerTest extends TestCase
     {
         $this->assertFalse(File::exists($this->controller));
 
-        $this->artisan('make:crud', ['name' => 'UserController'])
-            ->assertExitCode(0);
+        $this->runCommandWith(['name' => 'UserController']);
 
         $this->assertTrue(File::exists($this->controller));
 
         $this->assertEquals(
             File::get($this->controller),
-            File::get($this->getLocalStub('Controllers/EmptyUserController.php'))
+            File::get($this->getTestStub('Controllers/EmptyUserController.php'))
         );
     }
 }
