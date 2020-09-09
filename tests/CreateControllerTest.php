@@ -48,7 +48,7 @@ class CreateControllerTest extends TestCase
 
         $this->assertEquals(
             File::get($this->controller),
-            File::get(__DIR__.'/Stubs/Controllers/EmptyUserController.php')
+            File::get($this->getLocalStub('Controllers/EmptyUserController.php'))
         );
     }
 
@@ -90,12 +90,31 @@ class CreateControllerTest extends TestCase
 
         $this->assertEquals(
             File::get($this->controller),
-            File::get(__DIR__.'/Stubs/Controllers/UserControllerWithModel.php')
+            File::get($this->getLocalStub('Controllers/UserControllerWithModel.php'))
+        );
+
+        $this->deleteAppDirFiles();
+
+        $this->artisan('make:crud', ['name' => 'UserController', '--model' => 'User'])
+            ->expectsQuestion("A App\User model does not exist. Do you want to generate it?", false)
+            ->assertExitCode(0);
+
+        $this->assertTrue(File::exists($this->controller));
+        $this->assertFalse(File::exists($this->model));
+
+        $this->assertEquals(
+            File::get($this->controller),
+            File::get($this->getLocalStub('Controllers/UserControllerWithModel.php'))
         );
     }
 
     private function deleteAppDirFiles()
     {
         File::cleanDirectory(app_path());
+    }
+
+    private function getLocalStub($path)
+    {
+        return __DIR__."/Stubs/$path";
     }
 }
