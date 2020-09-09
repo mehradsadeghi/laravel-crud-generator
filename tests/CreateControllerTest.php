@@ -48,7 +48,7 @@ class CreateControllerTest extends TestCase
 
         $this->assertEquals(
             File::get($this->controller),
-            File::get(__DIR__.'/Stubs/Controllers/UserController.php')
+            File::get(__DIR__.'/Stubs/Controllers/EmptyUserController.php')
         );
     }
 
@@ -59,11 +59,39 @@ class CreateControllerTest extends TestCase
         $this->assertFalse(File::exists($this->model));
 
         $this->artisan('make:crud', ['name' => 'UserController', '--model' => 'User'])
-            ->expectsQuestion("A App\User model does not exist. Do you want to generate it?", 'yes')
+            ->expectsQuestion("A App\User model does not exist. Do you want to generate it?", true)
             ->assertExitCode(0);
 
         $this->assertTrue(File::exists($this->controller));
         $this->assertTrue(File::exists($this->model));
+
+        $this->deleteAppDirFiles();
+
+        $this->artisan('make:crud', ['name' => 'UserController', '--model' => 'User'])
+            ->expectsQuestion("A App\User model does not exist. Do you want to generate it?", false)
+            ->assertExitCode(0);
+
+        $this->assertTrue(File::exists($this->controller));
+        $this->assertFalse(File::exists($this->model));
+    }
+
+    /** @test */
+    public function controller_content_with_model_is_as_expected()
+    {
+        $this->assertFalse(File::exists($this->controller));
+        $this->assertFalse(File::exists($this->model));
+
+        $this->artisan('make:crud', ['name' => 'UserController', '--model' => 'User'])
+            ->expectsQuestion("A App\User model does not exist. Do you want to generate it?", true)
+            ->assertExitCode(0);
+
+        $this->assertTrue(File::exists($this->controller));
+        $this->assertTrue(File::exists($this->model));
+
+        $this->assertEquals(
+            File::get($this->controller),
+            File::get(__DIR__.'/Stubs/Controllers/UserControllerWithModel.php')
+        );
     }
 
     private function deleteAppDirFiles()
