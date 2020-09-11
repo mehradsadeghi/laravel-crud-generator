@@ -29,6 +29,9 @@
     }
   },
   "autoload-dev": {
+    "classmap": [
+      "vendor/orchestra/testbench-core/laravel/app"
+    ],
     "psr-4": {
       "Mehradsadeghi\\CrudGenerator\\Tests\\": "tests/",
       "App\\": "vendor/orchestra/testbench-core/laravel/app"

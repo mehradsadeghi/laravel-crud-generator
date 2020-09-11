@@ -54,7 +54,7 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
 
     protected function buildValidationReplacements(array $replace, $model)
     {
-        $fillables = app($model)->getFillable();
+        $fillables = resolve($model)->getFillable();
 
         $fillables = array_chunk($fillables, 1);
 
@@ -123,7 +123,7 @@ TEXT;
 
     private function modelHasFillables($model)
     {
-        if(File::exists(app_path("$model.php")) and app($this->parseModel($model))->getFillable()) {
+        if(File::exists(app_path("$model.php")) and resolve($this->parseModel($model))->getFillable()) {
             return true;
         }
 

@@ -6,12 +6,14 @@ use Illuminate\Console\Application;
 use Illuminate\Support\Facades\File;
 use Mehradsadeghi\CrudGenerator\Tests\Stubs\TestCrudGeneratorMakeCommand;
 use Mehradsadeghi\CrudGenerator\Tests\Stubs\TestCrudGeneratorServiceProvider;
+use Orchestra\Testbench\Concerns\CreatesApplication;
 use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $controller;
     protected $model;
+    protected $tester;
 
     protected function getPackageProviders($app)
     {
@@ -25,6 +27,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->controller = app_path('Http/Controllers/UserController.php');
         $this->model = app_path('User.php');
 
+//        $this->tester = $this->getTester();
+
+        $commands = ['clear-compiled', 'cache:clear', 'view:clear', 'config:clear', 'route:clear'];
+        foreach ($commands as $command) {
+            \Illuminate\Support\Facades\Artisan::call($command);
+        }
+
         $this->deleteAppDirFiles();
     }
 
@@ -36,16 +45,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function runCommandWith(array $arguments = [], array $interactiveInput = []): CommandTester
     {
-        $app = app(Application::class, ['version' => $this->app::VERSION]);
-//        $app = (new Application(['version' => $this->app::VERSION]));
-        $command = app(TestCrudGeneratorMakeCommand::class);
+        $app = resolve(Application::class, ['version' => $this->app::VERSION]);
+        $command = resolve(TestCrudGeneratorMakeCommand::class);
 
         $command->setLaravel($this->app);
         $command->setApplication($app);
 
-        $tester = app(CommandTester::class, ['command' => $command]);
-        $tester->setInputs($interactiveInput);
+        $tester = resolve(CommandTester::class, ['command' => $command]);
 
+        $tester->setInputs($interactiveInput);
         $tester->execute($arguments);
 
         return $tester;
@@ -59,5 +67,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getTestStub($path)
     {
         return __DIR__."/Stubs/$path";
+    }
+
+    private function getTester(): CommandTester
+    {
+        $app = resolve(Application::class, ['version' => $this->app::VERSION]);
+        $command = resolve(TestCrudGeneratorMakeCommand::class);
+
+        $command->setLaravel($this->app);
+        $command->setApplication($app);
+
+        $tester = resolve(CommandTester::class, ['command' => $command]);
+
+        return $tester;
     }
 }
