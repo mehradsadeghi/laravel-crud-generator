@@ -4,28 +4,28 @@ namespace Mehradsadeghi\CrudGenerator;
 
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class CrudGeneratorMakeCommand extends ControllerMakeCommand
-{
+class CrudGeneratorMakeCommand extends ControllerMakeCommand {
+
     protected $name = 'make:crud';
     protected $description = 'Create a controller with pre-defiend CRUD and validation rules';
     protected $type = 'Controller';
 
-    protected function buildClass($name)
-    {
+    protected function buildClass($name) {
         $controllerNamespace = $this->getNamespace($name);
 
         $replace = [];
 
-        if ($model = $this->option('model')) {
+        if($model = $this->option('model')) {
             $replace = $this->buildModelReplacements($replace);
         }
 
-        if ($model and $this->option('validation') and $this->modelHasFillables($model)) {
-            $replace = $this->buildValidationReplacements($replace, $replace['{{ namespacedModel }}']);
+        if($model and $this->option('validation')) {
+            $replace = $this->buildValidationReplacements($replace, $this->getFillables($model));
         }
 
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
@@ -36,8 +36,7 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
         return str_replace(array_keys($replace), array_values($replace), $stub);
     }
 
-    protected function buildModelReplacements(array $replace)
-    {
+    protected function buildModelReplacements(array $replace) {
         $replacements = parent::buildModelReplacements($replace);
 
         return [
@@ -52,10 +51,8 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
         ];
     }
 
-    protected function buildValidationReplacements(array $replace, $model)
+    protected function buildValidationReplacements(array $replace, $fillables)
     {
-        $fillables = resolve($model)->getFillable();
-
         $fillables = array_chunk($fillables, 1);
 
         $this->table([['fillables']], $fillables);
@@ -67,7 +64,7 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand
 
         $validations = '';
 
-        while($fillables) {
+        while ($fillables) {
 
             $field = $this->anticipate('Select Fillable By Arrow Keys or Typing It', $fillables);
 
@@ -93,36 +90,33 @@ TEXT;
         ]);
     }
 
-    protected function getStub()
-    {
+    protected function getStub() {
+
         $model = $this->option('model');
 
-        if ($model and $this->option('validation') and $this->modelHasFillables($model)) {
+        if($model and $this->option('validation') and $this->getFillables($model)) {
             return base_path('stubs/controller.model.validation.stub');
-        } elseif ($model) {
+        } elseif($model) {
             return base_path('stubs/controller.model.stub');
         } else {
             return base_path('stubs/controller.plain.stub');
         }
     }
 
-    protected function getArguments()
-    {
+    protected function getArguments() {
         return [
             ['name', InputArgument::REQUIRED, 'The name of the class'],
         ];
     }
 
-    protected function getOptions()
-    {
+    protected function getOptions() {
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
             ['validation', null, InputOption::VALUE_NONE, 'Implement validation rules based on given model'],
         ];
     }
 
-    private function modelHasFillables($model)
-    {
+    private function modelHasFillables($model) {
         if(File::exists(app_path("$model.php")) and resolve($this->parseModel($model))->getFillable()) {
             return true;
         }
@@ -130,10 +124,38 @@ TEXT;
         return false;
     }
 
-    private function unsetByValue($field, array $fillables)
-    {
+    private function unsetByValue($field, array $fillables) {
         $fieldKey = array_search($field, $fillables);
         unset($fillables[$fieldKey]);
         return $fillables;
+    }
+
+    private function getFillables($model) {
+
+        if($this->modelHasFillables($model)) {
+            return resolve($this->parseModel($model))->getFillable();
+        } elseif([$table, $guarded] = $this->modelHasSchemaAndGuarded($model)) {
+            $schema = Schema::getColumnListing($table);
+            return array_diff($schema, $guarded);
+        } else {
+            return [];
+        }
+    }
+
+    private function modelHasSchemaAndGuarded($model)
+    {
+        $table = Str::plural(lcfirst($model));
+
+        if(!Schema::hasTable($table)) {
+            return false;
+        }
+
+        $guarded = resolve($this->parseModel($model))->getGuarded();
+
+        if($guarded[0] == '*') {
+            return false;
+        }
+
+        return [$table, $guarded];
     }
 }
