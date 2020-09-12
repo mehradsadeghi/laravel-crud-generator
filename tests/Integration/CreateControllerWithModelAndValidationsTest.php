@@ -41,17 +41,14 @@ class CreateControllerWithModelAndValidationsTest extends TestCase
 
         $this->assertTrue(File::exists($this->model));
 
-        $this->runCommandWith(['name' => 'UserController', '--model' => 'User', '--validation' => true]);
+        $this->runCommandWith(['name' => 'UserController', '--model' => 'User', '--validation' => true], ['yes']);
 
-        /*$this->assertTrue(File::exists($this->controller));
         $this->assertEquals(
             File::get($this->controller),
             File::get($this->getTestStub('Controllers/UserControllerWithModel.php'))
-        );*/
+        );
 
-
-        /*$this->deleteAppDirFiles();
-        dd(File::get($this->model));
+        $this->deleteAppDirFiles();
 
         $this->assertFalse(File::exists($this->controller));
         $this->assertFalse(File::exists($this->model));
@@ -64,6 +61,6 @@ class CreateControllerWithModelAndValidationsTest extends TestCase
         $this->assertEquals(
             File::get($this->controller),
             File::get($this->getTestStub('Controllers/UserControllerWithModel.php'))
-        );*/
+        );
     }
 }
