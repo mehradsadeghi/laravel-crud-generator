@@ -89,13 +89,19 @@ TEXT;
 
         $model = $this->option('model');
 
+        $basePath = File::exists($this->laravel->basePath('stubs/crud'))
+            ? $this->laravel->basePath('stubs/crud')
+            : base_path('stubs');
+
         if($model and $this->option('validation') and $this->getFillables($model)) {
-            return base_path('stubs/controller.model.validation.stub');
+            $path = '/controller.model.validation.stub';
         } elseif($model) {
-            return base_path('stubs/controller.model.stub');
+            $path = '/controller.model.stub';
         } else {
-            return base_path('stubs/controller.plain.stub');
+            $path = '/controller.plain.stub';
         }
+
+        return $basePath.$path;
     }
 
     protected function getArguments() {

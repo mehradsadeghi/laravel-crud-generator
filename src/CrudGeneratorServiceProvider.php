@@ -9,7 +9,10 @@ class CrudGeneratorServiceProvider extends ServiceProvider {
     public function boot()
     {
         if($this->app->runningInConsole()) {
-            $this->commands([CrudGeneratorMakeCommand::class]);
+            $this->commands([
+                CrudGeneratorMakeCommand::class,
+                PublishCrudStubCommand::class
+            ]);
         }
     }
 }
