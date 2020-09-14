@@ -53,14 +53,9 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand {
 
     protected function buildValidationReplacements(array $replace, $fillables)
     {
-        $fillables = array_chunk($fillables, 1);
-
-        $this->table([['fillables']], $fillables);
-
+        $this->table([['fillables']], array_chunk($fillables, 1));
         $this->line('<fg=cyan;options=bold>>>></> Validation rules should be separated by <options=bold>white space</>.');
         $this->line('Example: required min:6 max:100</>');
-
-        $fillables = collect($fillables)->flatten()->toArray();
 
         $validations = '';
 

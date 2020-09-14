@@ -6,7 +6,6 @@ use Illuminate\Console\Application;
 use Illuminate\Support\Facades\File;
 use Mehradsadeghi\CrudGenerator\Tests\Stubs\TestCrudGeneratorMakeCommand;
 use Mehradsadeghi\CrudGenerator\Tests\Stubs\TestCrudGeneratorServiceProvider;
-use PHPUnit\Framework\TestResult;
 use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
