@@ -2,8 +2,6 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceHttp\Controllers\Controller;
-
 class DummyClass extends Controller
 {
     //

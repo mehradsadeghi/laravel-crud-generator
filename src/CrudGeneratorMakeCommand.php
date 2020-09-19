@@ -91,7 +91,7 @@ TEXT;
 
         $basePath = File::exists($this->laravel->basePath('stubs/crud'))
             ? $this->laravel->basePath('stubs/crud')
-            : base_path('stubs');
+            : __DIR__.'/stubs';
 
         if($model and $this->option('validation') and $this->getFillables($model)) {
             $path = '/controller.model.validation.stub';
@@ -118,7 +118,10 @@ TEXT;
     }
 
     private function modelHasFillables($model) {
-        if(File::exists(app_path("$model.php")) and resolve($this->parseModel($model))->getFillable()) {
+
+        $path = File::exists(app_path('Models')) ? app_path('Models') : app_path();
+
+        if(File::exists("$path/$model.php") and resolve($this->parseModel($model))->getFillable()) {
             return true;
         }
 
