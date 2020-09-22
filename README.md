@@ -10,7 +10,7 @@ Generate a CRUD scaffold like a breeze.
 It works based on your `$fillable` property of the target model.
 
 If you would like to use `$guarded` instead of `$fillable`, It is supported too. 
-In that case you'll need to have an existing `Schema` (table), Then the crud generator will autimatically figures out your fillables.
+In that case you'll need to have an existing `Schema` (table), Then the crud generator will automatically figures out your fillables.
 
 As an example when `$fillable` is available:
 
