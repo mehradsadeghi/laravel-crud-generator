@@ -6,6 +6,7 @@ use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -53,6 +54,10 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand {
 
     protected function buildValidationReplacements(array $replace, $fillables)
     {
+        if (!$fillables) {
+            return $replace;
+        }
+
         $this->table([['fillables']], array_chunk($fillables, 1));
         $this->line('<fg=cyan;options=bold>>>></> Validation rules should be separated by <options=bold>white space</>.');
         $this->line('Example: required min:6 max:100</>');
@@ -121,7 +126,11 @@ TEXT;
 
         $path = File::exists(app_path('Models')) ? app_path('Models') : app_path();
 
-        if(File::exists("$path/$model.php") and resolve($this->parseModel($model))->getFillable()) {
+        if(
+            File::exists("$path/$model.php") and
+            class_exists($this->parseModel($model)) and
+            resolve($this->parseModel($model))->getFillable()
+        ) {
             return true;
         }
 
@@ -138,7 +147,7 @@ TEXT;
 
         if($this->modelHasFillables($model)) {
             return resolve($this->parseModel($model))->getFillable();
-        } elseif([$table, $guarded] = $this->modelHasSchemaAndGuarded($model)) {
+        } elseif($this->isConnectedToDatabase() and [$table, $guarded] = $this->modelHasSchemaAndGuarded($model)) {
             $schema = Schema::getColumnListing($table);
             return array_diff($schema, $guarded);
         } else {
@@ -161,5 +170,13 @@ TEXT;
         }
 
         return [$table, $guarded];
+    }
+
+    private function isConnectedToDatabase() {
+        try {
+            DB::connection()->getPdo();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
