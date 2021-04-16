@@ -37,5 +37,5 @@ If you find this package useful and you want to encourage me to maintain and wor
 
 Send me as much as a cup of tea worth in your country, so I'll have the energy to maintain this package.
 
-- Etherium: 0x2D5BFdEc132F9F0E9498Fb0B58C800db4007D154
+- Ethereum: 0x2D5BFdEc132F9F0E9498Fb0B58C800db4007D154
 
