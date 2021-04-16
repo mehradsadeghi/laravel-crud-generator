@@ -25,3 +25,18 @@ You can modify default stubs by publishing them:
 
 The published stubs will be located within `stubs/crud` directory in the root of your application.
 Any changes you make to these stubs will be reflected when you generate crud.
+
+----------------------------------------------
+
+### Your Stars Matter 
+If you find this package useful and you want to encourage me to maintain and work on it, Just press the star button to declare your willing.
+
+----------------------------------------------
+
+### Reward me with a cup of tea :tea:
+
+Send me as much as a cup of tea worth in your country, so I'll have the energy to maintain this package.
+
+- Etherium: 0x2D5BFdEc132F9F0E9498Fb0B58C800db4007D154
+
+--------------
