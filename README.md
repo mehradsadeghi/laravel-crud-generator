@@ -39,4 +39,3 @@ Send me as much as a cup of tea worth in your country, so I'll have the energy t
 
 - Etherium: 0x2D5BFdEc132F9F0E9498Fb0B58C800db4007D154
 
---------------
