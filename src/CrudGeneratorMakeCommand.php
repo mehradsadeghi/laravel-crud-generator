@@ -2,13 +2,14 @@
 
 namespace Mehradsadeghi\CrudGenerator;
 
-use Illuminate\Routing\Console\ControllerMakeCommand;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Routing\Console\ControllerMakeCommand;
 
 class CrudGeneratorMakeCommand extends ControllerMakeCommand {
 
@@ -38,7 +39,31 @@ class CrudGeneratorMakeCommand extends ControllerMakeCommand {
     }
 
     protected function buildModelReplacements(array $replace) {
-        $replacements = parent::buildModelReplacements($replace);
+        $modelClass = $this->parseModel($this->option('model'));
+
+        try {
+            if (! class_exists($modelClass)) {
+                if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+                    $this->call('make:model', ['name' => $modelClass]);
+                }
+            }
+        } catch (Exception $exception) {
+            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+                $this->call('make:model', ['name' => $modelClass]);
+            }
+        }
+
+        $replacements = array_merge($replace, [
+            'DummyFullModelClass' => $modelClass,
+            '{{ namespacedModel }}' => $modelClass,
+            '{{namespacedModel}}' => $modelClass,
+            'DummyModelClass' => class_basename($modelClass),
+            '{{ model }}' => class_basename($modelClass),
+            '{{model}}' => class_basename($modelClass),
+            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+            '{{ modelVariable }}' => lcfirst(class_basename($modelClass)),
+            '{{modelVariable}}' => lcfirst(class_basename($modelClass)),
+        ]);
 
         return [
             '{{ modelPluralVariable }}' => Str::plural(lcfirst(class_basename($this->option('model')))),
@@ -175,7 +200,7 @@ TEXT;
     private function isConnectedToDatabase() {
         try {
             DB::connection()->getPdo();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
