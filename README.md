@@ -1,7 +1,7 @@
 # Laravel CRUD Generator
 Generate a CRUD scaffold like a breeze.
 
-*Compatible with Laravel **5.x** **6.x** **7.x** **8.x** **9.x***.
+*Compatible with Laravel **5.x** **6.x** **7.x** **8.x** **9.x** **10.x***.
 
 ### Installation
 `$ composer require mehradsadeghi/laravel-crud-generator`

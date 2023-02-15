@@ -4,5 +4,4 @@ notes
 vendor
 docker
 docker-compose.yaml
-composer.lock
 .phpunit.result.cache
